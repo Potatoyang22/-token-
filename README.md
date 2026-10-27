@@ -1,48 +1,105 @@
+# WhaleMeter · 鲸算
 
-# WhaleMeter · 大肥鱼 🐳
+一个本地优先的大模型余额、费用和 token 监控器。桌面挂件只保留图库中的蓝色鲸鱼，余额与扣费以小气泡的形式贴近鲸鱼显示；完整数据面板仍参考 Token Monitor 的信息层级。
 
-> 一只趴在桌面上的大肥鱼，替你看住大模型的余额和 Token。
+## 下载
 
-WhaleMeter 是一个本地优先的大模型用量与余额监控挂件。它没有复杂面板，也没有满屏仪表盘，桌面上只保留一只蓝色大肥鱼：余额放在它旁边的小气泡里，每次产生真实用量时，它就会吐出一个小泡泡，告诉你刚刚消耗了多少 Token，或在能够计算价格时显示本次估算扣费。
+Windows 安装包请前往 [Releases](https://github.com/xzy20080222-beep/-token-/releases)。
 
-它通过只读方式监听 Codex 本地会话日志中的 `token_usage_record`，不会主动调用模型，不会替你发送请求，也不会因为“监控用量”本身额外消耗任何 Token。对于 DeepSeek，WhaleMeter 还可以复用本地 Codex 已保存的 API Key 查询账户余额；这个请求只访问余额接口，同样不会产生模型调用。
+## 挂件模式
 
-![WhaleMeter 鲸鱼挂件](screenshots/codex-real-widget-preview.png)
+![鲸鱼挂件](docs/preview.png)
 
-## 为什么是鲸鱼？
+- 启动后默认只显示透明背景上的蓝色鲸鱼，完整面板藏在后台
+- 不再使用整块蓝色卡片，仅保留鲸鱼、白色余额气泡和扣费泡泡
+- 挂件使用最高置顶层，显示在 Codex 等前台窗口之上
+- 挂件可拖动、无任务栏图标，不会抢输入焦点
+- 默认只读监听 Codex 本地会话日志，真实调用发生后挂件自动出现
+- 本地代理收到 OpenAI-compatible 请求时同样会自动出现并同步
+- 本地监听不会调用模型，不产生额外 token 消耗
+- 每笔真实用量会产生一个“鲸鱼吐泡泡”气泡；已知价格时显示估算扣费，未知价格时显示本次 token
+- 余额刷新发现真实扣减时，会额外吐出一个“余额扣减”气泡
+- 本次扣费会立即从上次同步余额中扣除，服务商余额同步后自动校准
+- 连续请求会合并 UI 更新，最多保留 4 个扣费气泡，避免动画堆积
+- 点击挂件右上角箭头打开完整面板，关闭挂件后会在下次请求时自动出现
+- 可以在设置中关闭“使用模型时自动弹出挂件”
 
-因为监控 Token 这件事本来就很枯燥。  
-既然每天都要看余额、看消耗、看扣费，不如让一只大肥鱼来做。
+## 数据来源
 
-它不会打扰你工作：透明背景、始终置顶、可以拖动、不会抢走 Codex 的输入焦点。平时只安静地趴在桌面角落，发生真实消耗时才吐个泡泡提醒你。
+- Codex 本地只读监听：读取 `~/.codex/sessions/**/*.jsonl` 中的 `token_usage_record`
+- 本地代理：读取 OpenAI-compatible 请求响应中的 `usage`
+- 余额接口：只查询余额，不调用模型
+- 如果本地没有单独保存 API Key，会只读复用 `~/.codex/auth.json` 中的 `OPENAI_API_KEY` 查询 DeepSeek 余额，不复制、不写入挂件配置
+- 今日扣费以当天第一次成功同步的余额为基线，用后续真实余额下降计算
+- 挂件不再使用演示金额；未配置余额接口时显示 `—`
+- 当前模型价格未知时显示“费用未知”，不会伪造金额
 
-## 核心特性
+## 当前能力
 
-- 🐳 透明背景鲸鱼挂件，只保留大肥鱼和必要信息
-- 📉 实时显示真实账户余额与今日余额扣减
-- 🫧 每次真实用量自动吐出 Token 或扣费气泡
-- 📚 只读监听 `~/.codex/sessions/**/*.jsonl`，不调用模型
-- 🔑 自动复用本地 Codex 的 DeepSeek API Key 查询余额
-- 🔒 API Key 不复制、不打印、不写入挂件配置
-- 🧮 已知模型价格时显示估算扣费，未知价格时显示真实 Token
-- 🪟 Windows 原生 Electron 桌面应用
-- 📡 可选 OpenAI-compatible 本地代理，支持普通响应和 SSE 流式请求
-- 🚫 不保存 Prompt，不保存响应正文，不上传使用数据
-- ⚡ 更新合并、轻量动画和本地日志增量读取，尽量保持流畅
+- DeepSeek 余额查询：`GET /user/balance`
+- OpenRouter Credits 查询：`GET /api/v1/credits`
+- 自定义 JSON 余额接口与字段路径
+- 本地 OpenAI-compatible 代理：`http://127.0.0.1:8787/v1`
+- 从响应或 SSE 中读取 `usage`
+- 当上游没有返回 usage 时，按字符数估算 token，并在界面标记 `est.`
+- 显示今日消费、输入/输出 token、缓存命中、平均延迟、模型分布与实时请求流
+- API Key 使用 Electron `safeStorage` 调用 Windows 系统安全存储加密
+- 托盘入口、余额定时刷新和鲸鱼品牌图标
 
-## 设计原则
+## 运行
 
-**不为了监控而消耗 Token。**  
-WhaleMeter 只读取本地日志和余额接口，监控过程本身不会调用任何大模型。
+```powershell
+git clone https://github.com/xzy20080222-beep/-token-.git
+cd ./-token-
+npm install
+npm start
+```
 
-**不展示假数据。**  
-没有配置余额时显示 `—`；模型价格未知时显示“费用未知”；所有 Token 数字都来自真实本地用量记录。
+第一次启动会直接读取 Codex 本地用量；余额会自动复用本地 Codex 的 DeepSeek Key。需要更换服务商时，可从挂件打开完整面板并配置账户。
 
-**只保留最重要的信息。**  
-余额、今日扣减、今日 Token、最近一次用量——其他全部交给完整的详情面板。
+## 接入请求统计
 
-## 当前状态
+在支持自定义 Base URL 的 OpenAI 兼容客户端中，将地址改为：
 
-目前主要面向 Windows 和 Codex 使用场景。支持 DeepSeek 余额查询与 OpenAI-compatible 代理，更多模型和客户端适配仍在持续完善。
+```text
+http://127.0.0.1:8787/v1
+```
 
-如果这只大肥鱼帮你少看了一次账单，欢迎点一个 Star。⭐
+例如：
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://127.0.0.1:8787/v1",
+    api_key="任意占位值",  # WhaleMeter 会用设置中的真实 Key 覆盖
+)
+
+response = client.chat.completions.create(
+    model="deepseek-chat",
+    messages=[{"role": "user", "content": "你好"}],
+)
+```
+
+代理只会监听 `127.0.0.1`，请求会转发到设置中的“上游 Base URL”。WhaleMeter 不保存 prompt 或响应正文，只保存请求用量元数据。
+
+## 数据与安全
+
+- 配置文件、事件记录位于 Electron 的 `userData` 目录
+- API Key 通过操作系统安全存储加密
+- 余额来自各服务商接口，实际账单金额以服务商为准
+- 费用是 token × 本地价格表的估算值，不一定等于最终扣费
+- 自定义余额接口需要返回 JSON，字段路径例如 `data.balance`
+
+## 开发检查
+
+```powershell
+npm run check
+npm run capture
+```
+
+截图会写入 `screenshots/` 目录。
+
+## 设计与许可
+
+UI 设计语言参考 Token Monitor（MIT）。本项目代码使用 MIT License；用户提供的鲸鱼照片仅作为本项目的品牌素材使用。

@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>WhaleMeter · 鲸算</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+  <div class="app-shell">
+    <header class="titlebar">
+      <div class="brand">
+        <span class="brand-mark"><img src="../../assets/brand/whale-original.jpg" alt="" /></span>
+        <span class="brand-name">WhaleMeter</span>
+        <span class="brand-cn">鲸算</span>
+      </div>
+      <div class="titlebar-center">
+        <span class="live-dot"></span>
+        <span id="liveStatus">正在连接本地采集器</span>
+      </div>
+      <div class="window-actions">
+        <button class="window-btn" id="minimizeBtn" aria-label="最小化">−</button>
+        <button class="window-btn" id="maximizeBtn" aria-label="最大化">□</button>
+        <button class="window-btn close" id="closeBtn" aria-label="关闭">×</button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="rail">
+        <nav class="rail-nav" aria-label="主导航">
+          <button class="rail-btn active" data-target="overview" title="概览">
+            <svg viewBox="0 0 24 24"><path d="M4 13h6V4H4zm0 7h6v-5H4zm10 0h6V11h-6zm0-16v9h6V4z"/></svg>
+            <span>概览</span>
+          </button>
+          <button class="rail-btn" data-target="requests" title="请求">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>
+            <span>请求</span>
+          </button>
+          <button class="rail-btn" data-target="models" title="模型">
+            <svg viewBox="0 0 24 24"><path d="M12 2 3 7l9 5 9-5zM3 12l9 5 9-5v2l-9 5-9-5zm0 5 9 5 9-5v2l-9 5-9-5z"/></svg>
+            <span>模型</span>
+          </button>
+          <button class="rail-btn" id="settingsNav" title="设置">
+            <svg viewBox="0 0 24 24"><path d="M19.4 13a7.8 7.8 0 0 0 .1-1 7.8 7.8 0 0 0-.1-1l2.1-1.6-2-3.4-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3h-4l-.4 2.7a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.4L6.5 11a7.8 7.8 0 0 0-.1 1 7.8 7.8 0 0 0 .1 1l-2.1 1.6 2 3.4 2.5-1a7.4 7.4 0 0 0 1.7 1L11 21h4l.4-2.7a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.4zM13 15.5A3.5 3.5 0 1 1 13 8a3.5 3.5 0 0 1 0 7.5z"/></svg>
+            <span>设置</span>
+          </button>
+        </nav>
+        <div class="rail-foot">
+          <span class="rail-version" id="versionLabel">v0.1</span>
+          <span class="rail-orbit"><i></i></span>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section class="page-section" id="overview">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">LOCAL-FIRST · LIVE METERING</p>
+              <h1>今天的海面，<span>还算平静。</span></h1>
+              <p class="subtitle">余额、请求和 token 消耗，都在同一片海域里。</p>
+            </div>
+            <div class="heading-actions">
+              <button class="ghost-btn" id="refreshBtn">
+                <svg viewBox="0 0 24 24"><path d="M17.7 6.3A8 8 0 1 0 20 12h-2a6 6 0 1 1-1.8-4.3L13 11h7V4z"/></svg>
+                刷新余额
+              </button>
+              <button class="primary-btn" id="openSettingsBtn">配置账户</button>
+            </div>
+          </div>
+
+          <article class="hero-card">
+            <div class="hero-glow"></div>
+            <div class="whale-visual">
+              <div class="whale-halo"></div>
+              <img src="../../assets/brand/whale-original.jpg" alt="蓝色大肥鲸鱼" />
+              <div class="whale-caption">
+                <span class="pulse-dot"></span>
+                <span id="whaleCaption">正在巡游，等待第一笔请求</span>
+              </div>
+            </div>
+            <div class="hero-data">
+              <div class="hero-topline">
+                <span class="provider-chip" id="providerChip">DeepSeek</span>
+                <span class="demo-chip" id="demoChip">预览数据</span>
+                <span class="updated" id="balanceUpdated">尚未同步</span>
+              </div>
+              <div class="balance-block">
+                <span class="metric-label">账户余额</span>
+                <div class="balance-value"><span class="currency" id="balanceCurrency">¥</span><strong id="balanceValue">—</strong></div>
+                <p id="balanceMessage">填写 API Key 后同步真实余额</p>
+              </div>
+              <div class="hero-stats">
+                <div>
+                  <span>今日消费</span>
+                  <strong id="todayCost">$0.0000</strong>
+                </div>
+                <div>
+                  <span>今日 Tokens</span>
+                  <strong id="todayTokens">0</strong>
+                </div>
+                <div>
+                  <span>请求数</span>
+                  <strong id="todayRequests">0</strong>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <div class="metric-grid">
+            <article class="metric-card">
+              <div class="metric-icon blue"><svg viewBox="0 0 24 24"><path d="M4 18h16v2H4zM6 4h3v12H6zm5 5h3v7h-3zm5-3h3v10h-3z"/></svg></div>
+              <div><span>输入 Tokens</span><strong id="inputTokens">0</strong><small id="inputShare">0% 占比</small></div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon mint"><svg viewBox="0 0 24 24"><path d="m8 5 10 7-10 7z"/></svg></div>
+              <div><span>输出 Tokens</span><strong id="outputTokens">0</strong><small id="outputShare">0% 占比</small></div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon violet"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 5v5.4l4 2.3-1 1.7-5-2.9V7z"/></svg></div>
+              <div><span>平均延迟</span><strong id="avgLatency">0 ms</strong><small>最近 50 次请求</small></div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-icon amber"><svg viewBox="0 0 24 24"><path d="M12 2 2 20h20zM11 9h2v5h-2zm0 7h2v2h-2z"/></svg></div>
+              <div><span>缓存命中</span><strong id="cacheRate">0%</strong><small id="cacheHint">等待请求数据</small></div>
+            </article>
+          </div>
+
+          <div class="content-grid">
+            <article class="panel chart-panel">
+              <div class="panel-head">
+                <div><p class="panel-kicker">SPEND FLOW</p><h2>今日消耗曲线</h2></div>
+                <div class="chart-legend"><i></i>估算费用 <span id="chartTotal">$0.0000</span></div>
+              </div>
+              <div class="chart-wrap">
+                <div class="chart-grid"></div>
+                <svg id="spendChart" viewBox="0 0 720 220" preserveAspectRatio="none" aria-label="今日消费曲线">
+                  <defs>
+                    <linearGradient id="areaGradient" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0" stop-color="#8bb8ff" stop-opacity=".36" />
+                      <stop offset="1" stop-color="#8bb8ff" stop-opacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path id="areaPath" fill="url(#areaGradient)" d="" />
+                  <path id="linePath" fill="none" stroke="#92bdff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="" />
+                </svg>
+                <div class="chart-axis" id="chartAxis"></div>
+              </div>
+            </article>
+
+            <article class="panel feed-panel" id="requests">
+              <div class="panel-head">
+                <div><p class="panel-kicker">LIVE REQUESTS</p><h2>实时请求</h2></div>
+                <span class="live-pill"><i></i>LIVE</span>
+              </div>
+              <div class="request-list" id="requestList"></div>
+            </article>
+          </div>
+
+          <div class="bottom-grid" id="models">
+            <article class="panel account-panel">
+              <div class="panel-head">
+                <div><p class="panel-kicker">ACCOUNT</p><h2>账户与采集</h2></div>
+                <span class="status-pill" id="proxyStatusPill">本地代理启动中</span>
+              </div>
+              <div class="account-row">
+                <span class="account-icon"><img src="../../assets/brand/whale-original.jpg" alt="" /></span>
+                <div><strong id="accountProvider">DeepSeek</strong><small id="accountBase">https://api.deepseek.com</small></div>
+                <button class="mini-btn" id="editAccountBtn">编辑</button>
+              </div>
+              <div class="proxy-box">
+                <div><span>OpenAI-compatible proxy</span><code id="proxyUrl">http://127.0.0.1:8787/v1</code></div>
+                <button class="icon-btn" id="copyProxyBtn" title="复制代理地址"><svg viewBox="0 0 24 24"><path d="M8 8h11v12H8zm-3 3V4h11v2H7v5z"/></svg></button>
+              </div>
+              <p class="account-note">将客户端的 Base URL 指向这里，WhaleMeter 会在本机统计每次请求的 token 与估算费用。不会上传 prompt。</p>
+            </article>
+
+            <article class="panel model-panel">
+              <div class="panel-head">
+                <div><p class="panel-kicker">MODEL MIX</p><h2>模型消耗分布</h2></div>
+                <span class="subtle-count" id="modelCount">0 models</span>
+              </div>
+              <div class="model-breakdown" id="modelBreakdown"></div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog class="settings-dialog" id="settingsDialog">
+    <form method="dialog" id="settingsForm">
+      <div class="dialog-head">
+        <div><p class="eyebrow">CONFIGURATION</p><h2>连接你的模型账户</h2></div>
+        <button class="dialog-close" value="cancel" type="submit" aria-label="关闭">×</button>
+      </div>
+      <div class="dialog-body">
+        <div class="form-grid">
+          <label class="field">
+            <span>服务商</span>
+            <select id="providerSelect"></select>
+            <small id="providerHint">选择余额接口类型</small>
+          </label>
+          <label class="field">
+            <span>显示币种</span>
+            <select id="currencySelect"><option value="CNY">CNY · 人民币</option><option value="USD">USD · 美元</option></select>
+          </label>
+          <label class="field full">
+            <span>API Key</span>
+            <input id="apiKeyInput" type="password" autocomplete="off" placeholder="sk-..." />
+            <small id="apiKeyHint">API Key 使用 Windows 系统安全存储加密，不会以明文写入配置文件。</small>
+          </label>
+          <label class="field full">
+            <span>上游 Base URL</span>
+            <input id="baseUrlInput" type="url" placeholder="https://api.deepseek.com" />
+            <small>客户端应连接本地代理，代理会把 /v1/* 请求转发到这里。</small>
+          </label>
+          <label class="field full custom-only">
+            <span>自定义余额接口</span>
+            <input id="balanceUrlInput" type="url" placeholder="https://gateway.example.com/api/user/balance" />
+          </label>
+          <label class="field custom-only">
+            <span>余额字段路径</span>
+            <input id="balancePathInput" type="text" placeholder="data.balance" />
+          </label>
+          <label class="field custom-only">
+            <span>提示</span>
+            <small class="inline-note" id="customHint">余额接口需返回 JSON，字段路径支持 <code>data.balance</code>。</small>
+          </label>
+          <label class="field">
+            <span>余额刷新间隔</span>
+            <div class="input-suffix"><input id="pollInput" type="number" min="15" max="3600" /><span>秒</span></div>
+          </label>
+          <label class="field">
+            <span>本地代理端口</span>
+            <input id="portInput" type="number" min="1024" max="65535" />
+          </label>
+        </div>
+        <label class="switch-row">
+          <span><strong>演示数据</strong><small>没有配置账户时，用预览数据展示界面。</small></span>
+          <input id="demoToggle" type="checkbox" />
+          <i></i>
+        </label>
+        <label class="switch-row">
+          <span><strong>使用模型时自动弹出挂件</strong><small>本地代理收到监控模型的请求后，鲸鱼挂件会无焦点出现并同步数据。</small></span>
+          <input id="autoShowToggle" type="checkbox" />
+          <i></i>
+        </label>
+        <div class="dialog-note" id="dialogNote">余额来自服务商接口；费用为 token × 模型价格的估算值，实际账单以平台为准。</div>
+        <div class="dialog-error" id="dialogError" hidden></div>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="danger-link" id="clearKeyBtn">清除已保存密钥</button>
+        <span class="spacer"></span>
+        <button type="submit" class="ghost-btn" value="cancel">取消</button>
+        <button type="button" class="primary-btn" id="saveSettingsBtn">保存并同步</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
+

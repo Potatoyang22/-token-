@@ -1,0 +1,68 @@
+{
+  "name": "whalemeter",
+  "productName": "WhaleMeter",
+  "version": "0.4.1",
+  "description": "A local-first whale desktop widget for monitoring LLM token usage and balances without consuming extra tokens.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "capture": "electron . --capture",
+    "check": "node --check src/main.js && node --check src/preload.js && node --check src/services/store.js && node --check src/services/pricing.js && node --check src/services/providers.js && node --check src/services/proxy.js && node --check src/services/codex-watcher.js && node --check src/renderer/app.js && node --check src/renderer/widget.js",
+    "pack": "electron-builder --win --x64"
+  },
+  "keywords": [
+    "llm",
+    "token-usage",
+    "cost-tracking",
+    "codex",
+    "deepseek",
+    "electron",
+    "desktop-widget",
+    "local-first",
+    "usage-monitor",
+    "balance-monitor"
+  ],
+  "author": "Ziyang",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "43.7.9",
+    "electron-builder": "26.16.1"
+  },
+  "build": {
+    "appId": "com.ziyang.whalemeter",
+    "productName": "WhaleMeter",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xzy20080222-beep/-token-.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xzy20080222-beep/-token-/issues"
+  },
+  "homepage": "https://github.com/xzy20080222-beep/-token-#readme"
+}

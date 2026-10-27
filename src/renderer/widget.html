@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self';" />
+  <title>WhaleMeter Widget</title>
+  <link rel="stylesheet" href="widget.css" />
+</head>
+<body>
+  <main class="pet" id="widget">
+    <div class="whale-stage">
+      <img class="whale" src="../../assets/brand/whale-cutout.png" alt="蓝色大肥鲸鱼" />
+      <div class="bubble-layer" id="bubbleLayer" aria-live="polite"></div>
+    </div>
+
+    <section class="balance-bubble" aria-label="余额信息">
+      <div class="bubble-top">
+        <span class="provider" id="providerName">DeepSeek</span>
+        <span class="preview" id="previewTag">预览</span>
+      </div>
+      <div class="balance-line">
+        <span class="currency" id="currency">¥</span>
+        <strong id="balance">128.42</strong>
+      </div>
+      <div class="summary-line">
+        <span>今日扣减 <b id="todayCost">$0.0000</b></span>
+        <i></i>
+        <span><b id="todayTokens">0</b> tokens</span>
+      </div>
+      <div class="latest-line">
+        <span id="syncLabel"><i></i>同步中</span>
+        <span id="latestModel">等待请求</span>
+        <span id="latestCost">—</span>
+      </div>
+    </section>
+
+    <div class="pet-actions">
+      <button id="refreshBtn" title="刷新余额" aria-label="刷新余额">
+        <svg viewBox="0 0 24 24"><path d="M17.7 6.3A8 8 0 1 0 20 12h-2a6 6 0 1 1-1.8-4.3L13 11h7V4z" /></svg>
+      </button>
+      <button id="expandBtn" title="打开完整面板" aria-label="打开完整面板">
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </button>
+      <button id="closeWidgetBtn" title="收起挂件" aria-label="收起挂件">×</button>
+    </div>
+  </main>
+  <script src="widget.js"></script>
+</body>
+</html>
+
