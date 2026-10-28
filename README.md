@@ -1,10 +1,12 @@
 # WhaleMeter · 大肥鱼
 
+[简体中文](README.md) | [English](README.en.md)
+
 一个本地优先的大模型余额、费用和 token 监控器。桌面挂件只保留图库中的蓝色鲸鱼，余额与扣费以小气泡的形式贴近鲸鱼显示；完整数据面板仍参考 Token Monitor 的信息层级。
 
 ## 下载
 
-Windows 安装包请前往 [Releases](https://github.com/xzy20080222-beep/-token-/releases)。
+Windows 安装包请前往 [Releases](https://github.com/Potatoyang22/-token-/releases)。
 
 ## 挂件模式
 
@@ -49,7 +51,7 @@ Windows 安装包请前往 [Releases](https://github.com/xzy20080222-beep/-token
 ## 运行
 
 ```powershell
-git clone https://github.com/xzy20080222-beep/-token-.git
+git clone https://github.com/Potatoyang22/-token-.git
 cd ./-token-
 npm install
 npm start
@@ -99,6 +101,10 @@ npm run capture
 ```
 
 截图会写入 `screenshots/` 目录。
+
+## 安全
+
+请阅读 [SECURITY.md](SECURITY.md)。请不要通过公开 Issue 报告安全漏洞，也不要附带 API Key、Cookie 或未经脱敏的会话日志。
 
 ## 设计与许可
 
